@@ -1,10 +1,12 @@
 const output = document.getElementById("output");
+const loading = document.getElementById("loading");
+const errorDiv = document.getElementById("error");
 
-// Image URLs array
+// Image URLs
 const imageUrls = [
   "https://picsum.photos/200/300",
   "https://picsum.photos/250/300",
-  "https://picsum.photos/200/250"
+  "https://picsum.photos/200/250",
 ];
 
 // Function to download a single image
@@ -18,21 +20,20 @@ function downloadImage(url) {
   });
 }
 
+// Main function
 function downloadImages() {
-  // Clear output
+  // Clear previous state
   output.innerHTML = "";
+  errorDiv.innerHTML = "";
 
-  // Create loading spinner inside output
-  const loading = document.createElement("div");
+  // Show loading spinner
   loading.textContent = "Loading images...";
   loading.style.fontSize = "20px";
   loading.style.fontWeight = "bold";
-  output.appendChild(loading);
 
-  // Start downloading images
   Promise.all(imageUrls.map(downloadImage))
     .then((images) => {
-      output.innerHTML = ""; // remove loading
+      loading.textContent = ""; // hide loading
 
       images.forEach((img) => {
         img.style.margin = "10px";
@@ -41,14 +42,13 @@ function downloadImages() {
       });
     })
     .catch((error) => {
-      output.innerHTML = ""; // remove loading
-      const err = document.createElement("div");
-      err.style.color = "red";
-      err.style.fontSize = "18px";
-      err.textContent = error;
-      output.appendChild(err);
+      loading.textContent = ""; // hide loading
+      errorDiv.textContent = error;
+      errorDiv.style.color = "red";
+      errorDiv.style.fontSize = "18px";
     });
 }
 
-// Automatically run on page load
+// Run on page load
 downloadImages();
+
