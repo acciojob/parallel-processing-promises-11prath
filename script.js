@@ -3,42 +3,49 @@ const loading = document.getElementById("loading");
 const errorDiv = document.getElementById("error");
 
 const imageUrls = [
-"https://picsum.photos/200/300",
-"https://picsum.photos/250/300",
-"https://picsum.photos/200/250"
+  "https://picsum.photos/200/300",
+  "https://picsum.photos/250/300",
+  "https://picsum.photos/200/250"
 ];
 
-// show loading spinner first
-loading.textContent = "Loading...";
+// function to download single image
+function downloadImage(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
 
-// function to download image
-function downloadImage(url){
-return new Promise((resolve,reject)=>{
+    img.onload = () => resolve(img);
+    img.onerror = () => reject("Error loading images");
 
-const img = new Image();
-img.src = url;
-
-img.onload = ()=> resolve(img);
-img.onerror = ()=> reject("Failed to load image");
-
-});
+    img.src = url;
+  });
 }
 
-// start downloads
-Promise.all(imageUrls.map(downloadImage))
-.then(images=>{
+function downloadImages() {
 
-loading.textContent = "";
+  // keep output empty initially
+  output.innerHTML = "";
+  errorDiv.textContent = "";
 
-images.forEach(img=>{
-output.appendChild(img);
-});
+  // show loading text
+  loading.textContent = "Loading...";
 
-})
-.catch(err=>{
+  Promise.all(imageUrls.map(downloadImage))
+    .then((images) => {
 
-loading.textContent = "";
-errorDiv.textContent = err;
+      loading.textContent = "";
 
-});
+      images.forEach((img) => {
+        output.appendChild(img);
+      });
 
+    })
+    .catch((err) => {
+
+      loading.textContent = "";
+      errorDiv.textContent = err;
+
+    });
+}
+
+// start download
+downloadImages();
