@@ -2,53 +2,43 @@ const output = document.getElementById("output");
 const loading = document.getElementById("loading");
 const errorDiv = document.getElementById("error");
 
-// Image URLs
 const imageUrls = [
-  "https://picsum.photos/200/300",
-  "https://picsum.photos/250/300",
-  "https://picsum.photos/200/250",
+"https://picsum.photos/200/300",
+"https://picsum.photos/250/300",
+"https://picsum.photos/200/250"
 ];
 
-// Function to download a single image
-function downloadImage(url) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.src = url;
+// show loading spinner first
+loading.textContent = "Loading...";
 
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(`Failed to load image: ${url}`);
-  });
+// function to download image
+function downloadImage(url){
+return new Promise((resolve,reject)=>{
+
+const img = new Image();
+img.src = url;
+
+img.onload = ()=> resolve(img);
+img.onerror = ()=> reject("Failed to load image");
+
+});
 }
 
-// Main function
-function downloadImages() {
-  // Clear previous state
-  output.innerHTML = "";
-  errorDiv.innerHTML = "";
+// start downloads
+Promise.all(imageUrls.map(downloadImage))
+.then(images=>{
 
-  // Show loading spinner
-  loading.textContent = "Loading images...";
-  loading.style.fontSize = "20px";
-  loading.style.fontWeight = "bold";
+loading.textContent = "";
 
-  Promise.all(imageUrls.map(downloadImage))
-    .then((images) => {
-      loading.textContent = ""; // hide loading
+images.forEach(img=>{
+output.appendChild(img);
+});
 
-      images.forEach((img) => {
-        img.style.margin = "10px";
-        img.style.border = "2px solid #444";
-        output.appendChild(img);
-      });
-    })
-    .catch((error) => {
-      loading.textContent = ""; // hide loading
-      errorDiv.textContent = error;
-      errorDiv.style.color = "red";
-      errorDiv.style.fontSize = "18px";
-    });
-}
+})
+.catch(err=>{
 
-// Run on page load
-downloadImages();
+loading.textContent = "";
+errorDiv.textContent = err;
+
+});
 
